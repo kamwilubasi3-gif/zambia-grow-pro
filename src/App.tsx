@@ -3,7 +3,13 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import { AppProvider } from "@/context/AppContext";
+import AppShell from "@/components/AppShell";
+import HomePage from "@/pages/HomePage";
+import CropScannerPage from "@/pages/CropScannerPage";
+import PredictorPage from "@/pages/PredictorPage";
+import NotificationsPage from "@/pages/NotificationsPage";
+import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -11,15 +17,22 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AppProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppShell>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/scanner" element={<CropScannerPage />} />
+              <Route path="/predictor" element={<PredictorPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppShell>
+        </BrowserRouter>
+      </AppProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

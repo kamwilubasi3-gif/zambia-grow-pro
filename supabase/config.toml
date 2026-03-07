@@ -1,1 +1,10 @@
 project_id = "slhtxwrunwhswxxulchr"
+
+[functions.weather]
+verify_jwt = false
+
+[functions.ai-insight]
+verify_jwt = false
+
+[functions.crop-scanner]
+verify_jwt = false
