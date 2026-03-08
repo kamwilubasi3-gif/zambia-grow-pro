@@ -40,12 +40,23 @@ ${crop ? `Active crop: ${crop}` : 'No crop selected yet'}
 ${nasaData}
 Give a farming dashboard insight for today. Respond ONLY with valid JSON.`;
     } else if (type === "prediction") {
-      systemPrompt = `You are an expert agricultural AI for Zambian farmers. Analyze weather, soil, satellite data to predict crop outcomes. Respond in JSON with these exact keys: bestPlantingTime (string), expectedYield (string), risks (string), soilPreparation (string), waterNeeds (string), harvestTimeline (string), overallScore (number 0-100 representing success probability). Be specific to the location and crop.`;
+      systemPrompt = `You are an expert agricultural AI for Zambian farmers. Analyze weather, soil, satellite data to predict crop outcomes. Respond in JSON with these exact keys:
+- bestPlantingTime (string)
+- expectedYield (string)
+- risks (string)
+- soilPreparation (string)
+- waterNeeds (string)
+- harvestTimeline (string)
+- overallScore (number 0-100)
+- growthRateByMonth: array of 6 objects {month: string, rate: number 0-100} showing projected growth % over growing season
+- harvestChanceByMonth: array of 6 objects {month: string, chance: number 0-100} showing harvest probability over time
+- yieldProjection: array of 5 objects {planted: string like "1 acre", yield: string like "2.5 tons", yieldNum: number} showing expected harvest for different planting amounts
+Be specific to the location and crop.`;
       userPrompt = `Location: ${location.district}, ${location.province}, Zambia.
 Crop to analyze: ${crop}
 ${nasaData}
 ${weather ? `Current weather: ${weather.temp}°C, ${weather.humidity}% humidity, ${weather.description}` : ''}
-Give detailed prediction for planting ${crop} in this location. Consider Zambia's farming seasons, local soil types, rainfall patterns. Be specific and practical. Respond ONLY with valid JSON.`;
+Give detailed prediction for planting ${crop} in this location. Consider Zambia's farming seasons, local soil types, rainfall patterns. Be specific and practical. Include realistic month-by-month growth rates, harvest probability curves, and yield projections for 1, 2, 5, 10, and 20 acres. Respond ONLY with valid JSON.`;
     }
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
