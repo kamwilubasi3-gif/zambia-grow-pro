@@ -3,6 +3,15 @@ import { useAppState } from "@/context/AppContext";
 import { ZAMBIA_CROPS } from "@/data/zambia";
 import { Brain, Loader2, Sprout, Calendar, TrendingUp, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+  AreaChart, Area, BarChart, Bar, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, ResponsiveContainer,
+} from "recharts";
 
 interface PredictionResult {
   bestPlantingTime: string;
@@ -12,7 +21,20 @@ interface PredictionResult {
   waterNeeds: string;
   harvestTimeline: string;
   overallScore: number;
+  growthRateByMonth?: { month: string; rate: number }[];
+  harvestChanceByMonth?: { month: string; chance: number }[];
+  yieldProjection?: { planted: string; yield: string; yieldNum: number }[];
 }
+
+const growthConfig = {
+  rate: { label: "Growth Rate %", color: "hsl(var(--primary))" },
+};
+const harvestConfig = {
+  chance: { label: "Harvest Chance %", color: "hsl(var(--accent))" },
+};
+const yieldConfig = {
+  yieldNum: { label: "Expected Yield (tons)", color: "hsl(145, 45%, 40%)" },
+};
 
 const PredictorPage = () => {
   const { location, selectedCrop, setSelectedCrop } = useAppState();
@@ -31,11 +53,7 @@ const PredictorPage = () => {
     setPrediction(null);
     try {
       const { data, error } = await supabase.functions.invoke("ai-insight", {
-        body: {
-          location,
-          crop,
-          type: "prediction",
-        },
+        body: { location, crop, type: "prediction" },
       });
       if (error) throw error;
       setPrediction(data);
@@ -56,13 +74,13 @@ const PredictorPage = () => {
   }
 
   return (
-    <div className="px-4 pt-6 space-y-4 max-w-lg mx-auto animate-slide-up">
+    <div className="px-4 pt-6 pb-24 space-y-4 max-w-lg mx-auto animate-slide-up">
       <div className="flex items-center gap-2">
         <Brain className="w-5 h-5 text-primary" />
         <h1 className="text-xl font-bold text-foreground">AI Predictor</h1>
       </div>
       <p className="text-xs text-muted-foreground">
-        Select a crop to get AI predictions on planting time, yield, and more for {location.district}.
+        Select a crop to get AI predictions for {location.district}.
       </p>
 
       {/* Crop Selection */}
@@ -111,7 +129,7 @@ const PredictorPage = () => {
 
       {/* Prediction Result */}
       {prediction && !predicting && (
-        <div className="space-y-3 animate-slide-up">
+        <div className="space-y-4 animate-slide-up">
           {/* Score */}
           <div className="glass-card rounded-xl p-4 text-center">
             <p className="text-xs text-muted-foreground mb-1">Success Probability</p>
@@ -119,11 +137,75 @@ const PredictorPage = () => {
             <p className="text-xs text-muted-foreground mt-1">for {localCrop} in {location.district}</p>
           </div>
 
+          {/* Growth Rate Chart */}
+          {prediction.growthRateByMonth && prediction.growthRateByMonth.length > 0 && (
+            <div className="glass-card rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-primary" />
+                Growth Rate Over Season
+              </h3>
+              <ChartContainer config={growthConfig} className="h-[200px] w-full">
+                <AreaChart data={prediction.growthRateByMonth}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="month" className="text-[10px]" tick={{ fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))" }} className="text-[10px]" />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <defs>
+                    <linearGradient id="growthGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0.05} />
+                    </linearGradient>
+                  </defs>
+                  <Area type="monotone" dataKey="rate" stroke="hsl(var(--primary))" fill="url(#growthGrad)" strokeWidth={2} />
+                </AreaChart>
+              </ChartContainer>
+            </div>
+          )}
+
+          {/* Harvest Chance Chart */}
+          {prediction.harvestChanceByMonth && prediction.harvestChanceByMonth.length > 0 && (
+            <div className="glass-card rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                <Sprout className="w-4 h-4 text-accent" />
+                Harvest Probability
+              </h3>
+              <ChartContainer config={harvestConfig} className="h-[200px] w-full">
+                <LineChart data={prediction.harvestChanceByMonth}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="month" tick={{ fill: "hsl(var(--muted-foreground))" }} className="text-[10px]" />
+                  <YAxis domain={[0, 100]} tick={{ fill: "hsl(var(--muted-foreground))" }} className="text-[10px]" />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Line type="monotone" dataKey="chance" stroke="hsl(var(--accent))" strokeWidth={2.5} dot={{ fill: "hsl(var(--accent))", r: 4 }} />
+                </LineChart>
+              </ChartContainer>
+            </div>
+          )}
+
+          {/* Yield Projection Chart */}
+          {prediction.yieldProjection && prediction.yieldProjection.length > 0 && (
+            <div className="glass-card rounded-xl p-4">
+              <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-primary" />
+                Yield Projection by Area Planted
+              </h3>
+              <ChartContainer config={yieldConfig} className="h-[200px] w-full">
+                <BarChart data={prediction.yieldProjection}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="planted" tick={{ fill: "hsl(var(--muted-foreground))" }} className="text-[10px]" />
+                  <YAxis tick={{ fill: "hsl(var(--muted-foreground))" }} className="text-[10px]" />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="yieldNum" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ChartContainer>
+            </div>
+          )}
+
+          {/* Info Cards */}
           <div className="grid grid-cols-1 gap-3">
-            <InfoCard icon={<Calendar className="w-4 h-4 text-info" />} title="Best Planting Time" content={prediction.bestPlantingTime} />
-            <InfoCard icon={<TrendingUp className="w-4 h-4 text-success" />} title="Expected Yield" content={prediction.expectedYield} />
+            <InfoCard icon={<Calendar className="w-4 h-4 text-primary" />} title="Best Planting Time" content={prediction.bestPlantingTime} />
+            <InfoCard icon={<TrendingUp className="w-4 h-4 text-accent" />} title="Expected Yield" content={prediction.expectedYield} />
             <InfoCard icon={<Sprout className="w-4 h-4 text-primary" />} title="Soil Preparation" content={prediction.soilPreparation} />
-            <InfoCard icon={<AlertTriangle className="w-4 h-4 text-warning" />} title="Risks & Challenges" content={prediction.risks} />
+            <InfoCard icon={<AlertTriangle className="w-4 h-4 text-destructive" />} title="Risks & Challenges" content={prediction.risks} />
             <InfoCard icon={<Calendar className="w-4 h-4 text-accent" />} title="Harvest Timeline" content={prediction.harvestTimeline} />
           </div>
         </div>
