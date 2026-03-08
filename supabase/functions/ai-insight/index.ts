@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -10,9 +10,9 @@ serve(async (req) => {
 
   try {
     const { location, weather, crop, type } = await req.json();
-    const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY");
+    const API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const NASA_KEY = Deno.env.get("NASA_API_KEY");
-    if (!OPENAI_KEY) throw new Error("OPENAI_API_KEY not configured");
+    if (!API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     // Fetch NASA POWER data for soil/climate
     let nasaData = "";
@@ -38,42 +38,47 @@ serve(async (req) => {
 Current weather: ${weather ? `${weather.temp}°C, ${weather.humidity}% humidity, ${weather.wind_speed}m/s wind, ${weather.description}` : 'unavailable'}.
 ${crop ? `Active crop: ${crop}` : 'No crop selected yet'}
 ${nasaData}
-Give a farming dashboard insight for today.`;
+Give a farming dashboard insight for today. Respond ONLY with valid JSON.`;
     } else if (type === "prediction") {
       systemPrompt = `You are an expert agricultural AI for Zambian farmers. Analyze weather, soil, satellite data to predict crop outcomes. Respond in JSON with these exact keys: bestPlantingTime (string), expectedYield (string), risks (string), soilPreparation (string), waterNeeds (string), harvestTimeline (string), overallScore (number 0-100 representing success probability). Be specific to the location and crop.`;
       userPrompt = `Location: ${location.district}, ${location.province}, Zambia.
 Crop to analyze: ${crop}
 ${nasaData}
 ${weather ? `Current weather: ${weather.temp}°C, ${weather.humidity}% humidity, ${weather.description}` : ''}
-Give detailed prediction for planting ${crop} in this location. Consider Zambia's farming seasons, local soil types, rainfall patterns. Be specific and practical.`;
+Give detailed prediction for planting ${crop} in this location. Consider Zambia's farming seasons, local soil types, rainfall patterns. Be specific and practical. Respond ONLY with valid JSON.`;
     }
 
-    const openaiResp = await fetch("https://api.openai.com/v1/chat/completions", {
+    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${OPENAI_KEY}`,
+        "Authorization": `Bearer ${API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
         temperature: 0.7,
-        response_format: { type: "json_object" },
       }),
     });
 
-    if (!openaiResp.ok) {
-      const errText = await openaiResp.text();
-      console.error("OpenAI error:", openaiResp.status, errText);
-      throw new Error(`OpenAI API error: ${openaiResp.status}`);
+    if (!aiResp.ok) {
+      const errText = await aiResp.text();
+      console.error("AI error:", aiResp.status, errText);
+      throw new Error(`AI API error: ${aiResp.status}`);
     }
 
-    const result = await openaiResp.json();
+    const result = await aiResp.json();
     const content = result.choices[0].message.content;
-    const parsed = JSON.parse(content);
+    
+    // Extract JSON from response (handle markdown code blocks)
+    let jsonStr = content;
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch) jsonStr = jsonMatch[1].trim();
+    
+    const parsed = JSON.parse(jsonStr);
 
     return new Response(JSON.stringify(parsed), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

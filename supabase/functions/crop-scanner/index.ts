@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -10,8 +10,8 @@ serve(async (req) => {
 
   try {
     const { image, location } = await req.json();
-    const OPENAI_KEY = Deno.env.get("OPENAI_API_KEY");
-    if (!OPENAI_KEY) throw new Error("OPENAI_API_KEY not configured");
+    const API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     if (!image) throw new Error("No image provided");
 
@@ -19,14 +19,14 @@ serve(async (req) => {
       ? `The farmer is in ${location.district}, ${location.province}, Zambia.`
       : "Location unknown.";
 
-    const openaiResp = await fetch("https://api.openai.com/v1/chat/completions", {
+    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${OPENAI_KEY}`,
+        "Authorization": `Bearer ${API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "gpt-4o-mini",
+        model: "google/gemini-2.5-flash",
         messages: [
           {
             role: "system",
@@ -53,13 +53,13 @@ Be practical and specific. Use simple language a farmer can understand.`,
       }),
     });
 
-    if (!openaiResp.ok) {
-      const errText = await openaiResp.text();
-      console.error("OpenAI vision error:", openaiResp.status, errText);
-      throw new Error(`OpenAI API error: ${openaiResp.status}`);
+    if (!aiResp.ok) {
+      const errText = await aiResp.text();
+      console.error("AI vision error:", aiResp.status, errText);
+      throw new Error(`AI API error: ${aiResp.status}`);
     }
 
-    const result = await openaiResp.json();
+    const result = await aiResp.json();
     const analysis = result.choices[0].message.content;
 
     return new Response(JSON.stringify({ analysis }), {
