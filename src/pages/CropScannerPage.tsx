@@ -25,16 +25,20 @@ const CropScannerPage = () => {
         video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
       setCameraActive(true);
     } catch (e) {
       console.error("Camera error:", e);
       alert("Camera access denied. Enable it in your browser settings.");
     }
   };
+
+  // Attach stream to video element after it renders
+  useEffect(() => {
+    if (cameraActive && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(console.error);
+    }
+  }, [cameraActive]);
 
   const captureFrame = useCallback((): string | null => {
     if (!videoRef.current || !canvasRef.current) return null;
