@@ -64,8 +64,8 @@ const PWAInstallPrompt = () => {
     <div className="fixed top-0 left-0 right-0 z-[100] animate-slide-up">
       <div className="mx-3 mt-3 rounded-2xl bg-primary text-primary-foreground p-4 shadow-2xl">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-xl bg-primary-foreground/20 flex items-center justify-center flex-shrink-0">
-            <Download className="w-6 h-6" />
+          <div className="w-12 h-12 rounded-xl bg-primary-foreground/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            <img src="/app-icon.png" alt="Time Farmer app icon" className="w-full h-full object-cover" loading="lazy" />
           </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-sm">Install Time Farmer</h3>
