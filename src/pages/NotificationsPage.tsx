@@ -81,6 +81,26 @@ const NotificationsPage = () => {
         <p className="text-sm text-muted-foreground text-center py-8">No notifications yet. Tap refresh above.</p>
       )}
 
+      {broadcasts.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-xs font-semibold uppercase text-muted-foreground">Admin Announcements</h2>
+          {broadcasts.map((b: any) => (
+            <div key={b.id} className="glass-card rounded-xl p-4 border-primary/30">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mt-0.5">
+                  <Megaphone className="w-4 h-4 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-foreground">{b.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{b.message}</p>
+                  <p className="text-[10px] text-muted-foreground mt-2">{new Date(b.timestamp).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="space-y-2">
         {notifications.map((n) => (
           <div key={n.id} className="glass-card rounded-xl p-4">
