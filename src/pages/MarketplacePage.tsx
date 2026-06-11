@@ -44,7 +44,7 @@ const demandColor = (lvl: string) => {
 
 const MarketplacePage = () => {
   const { selectedCrop, setSelectedCrop, location } = useAppState();
-  const [crop, setCrop] = useState(selectedCrop || ZAMBIA_CROPS[0]);
+  const [crop, setCrop] = useState(selectedCrop || ALL_CROPS[0]);
   const [quantity, setQuantity] = useState("");
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<MarketData | null>(null);
@@ -94,7 +94,7 @@ const MarketplacePage = () => {
               onChange={(e) => setCrop(e.target.value)}
               className="w-full mt-1 h-10 rounded-md border border-input bg-background px-3 text-sm"
             >
-              {ZAMBIA_CROPS.map((c) => <option key={c} value={c}>{c}</option>)}
+              {ALL_CROPS.map((c) => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
           <div>
