@@ -10,31 +10,31 @@ const SettingsPage = () => {
   } = useAppState();
 
   const handleCameraToggle = async () => {
-    if (cameraAllowed) {
-      alert("Camera access cannot be disabled once enabled — required for real-time crop scanning.");
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      stream.getTracks().forEach((t) => t.stop());
-      setCameraAllowed(true);
-    } catch {
-      alert("Camera permission denied by browser. Please enable in browser settings.");
+    if (!cameraAllowed) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach((t) => t.stop());
+        setCameraAllowed(true);
+      } catch {
+        alert("Camera permission denied by browser. Please enable in browser settings.");
+      }
+    } else {
+      setCameraAllowed(false);
     }
   };
 
   const handleLocationToggle = async () => {
-    if (locationAllowed) {
-      alert("Location access cannot be disabled once enabled — required for real-time weather alerts.");
-      return;
-    }
-    try {
-      await new Promise<GeolocationPosition>((res, rej) =>
-        navigator.geolocation.getCurrentPosition(res, rej)
-      );
-      setLocationAllowed(true);
-    } catch {
-      alert("Location permission denied. Please enable in browser settings.");
+    if (!locationAllowed) {
+      try {
+        await new Promise<GeolocationPosition>((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej)
+        );
+        setLocationAllowed(true);
+      } catch {
+        alert("Location permission denied. Please enable in browser settings.");
+      }
+    } else {
+      setLocationAllowed(false);
     }
   };
 

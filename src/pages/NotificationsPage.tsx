@@ -1,26 +1,17 @@
 import { useEffect, useState } from "react";
 import { useAppState, WeatherNotification } from "@/context/AppContext";
-import { readBroadcasts } from "@/context/AuthContext";
-import { Bell, Trash2, Cloud, Loader2, Megaphone } from "lucide-react";
+import { Bell, Trash2, Cloud, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const NotificationsPage = () => {
   const { location, notifications, addNotification, clearNotifications } = useAppState();
   const [loading, setLoading] = useState(false);
-  const [broadcasts, setBroadcasts] = useState(readBroadcasts());
 
   useEffect(() => {
     if (location && notifications.length === 0) {
       fetchWeatherAlert();
     }
   }, [location]);
-
-  useEffect(() => {
-    const refresh = () => setBroadcasts(readBroadcasts());
-    window.addEventListener("tf-broadcast", refresh);
-    const i = setInterval(refresh, 3000);
-    return () => { window.removeEventListener("tf-broadcast", refresh); clearInterval(i); };
-  }, []);
 
   const fetchWeatherAlert = async () => {
     if (!location) return;
@@ -79,26 +70,6 @@ const NotificationsPage = () => {
 
       {notifications.length === 0 && location && (
         <p className="text-sm text-muted-foreground text-center py-8">No notifications yet. Tap refresh above.</p>
-      )}
-
-      {broadcasts.length > 0 && (
-        <div className="space-y-2">
-          <h2 className="text-xs font-semibold uppercase text-muted-foreground">Admin Announcements</h2>
-          {broadcasts.map((b: any) => (
-            <div key={b.id} className="glass-card rounded-xl p-4 border-primary/30">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center mt-0.5">
-                  <Megaphone className="w-4 h-4 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-foreground">{b.title}</h3>
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{b.message}</p>
-                  <p className="text-[10px] text-muted-foreground mt-2">{new Date(b.timestamp).toLocaleString()}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       )}
 
       <div className="space-y-2">
