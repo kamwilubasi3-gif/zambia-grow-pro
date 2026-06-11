@@ -1,17 +1,26 @@
 import { useEffect, useState } from "react";
 import { useAppState, WeatherNotification } from "@/context/AppContext";
-import { Bell, Trash2, Cloud, Loader2 } from "lucide-react";
+import { readBroadcasts } from "@/context/AuthContext";
+import { Bell, Trash2, Cloud, Loader2, Megaphone } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 const NotificationsPage = () => {
   const { location, notifications, addNotification, clearNotifications } = useAppState();
   const [loading, setLoading] = useState(false);
+  const [broadcasts, setBroadcasts] = useState(readBroadcasts());
 
   useEffect(() => {
     if (location && notifications.length === 0) {
       fetchWeatherAlert();
     }
   }, [location]);
+
+  useEffect(() => {
+    const refresh = () => setBroadcasts(readBroadcasts());
+    window.addEventListener("tf-broadcast", refresh);
+    const i = setInterval(refresh, 3000);
+    return () => { window.removeEventListener("tf-broadcast", refresh); clearInterval(i); };
+  }, []);
 
   const fetchWeatherAlert = async () => {
     if (!location) return;
