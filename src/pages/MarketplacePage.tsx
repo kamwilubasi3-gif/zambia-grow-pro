@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useAppState } from "@/context/AppContext";
 import { ZAMBIA_CROPS } from "@/data/zambia";
+
+const ALL_CROPS = Array.from(new Set(Object.values(ZAMBIA_CROPS).flat())).sort();
 import { supabase } from "@/integrations/supabase/client";
 import { Store, Phone, Mail, Globe, MapPin, TrendingUp, Loader2, Sparkles, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
