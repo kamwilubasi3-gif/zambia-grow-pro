@@ -10,6 +10,7 @@ import CropScannerPage from "@/pages/CropScannerPage";
 import PredictorPage from "@/pages/PredictorPage";
 import NotificationsPage from "@/pages/NotificationsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import MarketplacePage from "@/pages/MarketplacePage";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 import NotFound from "./pages/NotFound";
 
@@ -29,6 +30,7 @@ const App = () => (
               <Route path="/scanner" element={<CropScannerPage />} />
               <Route path="/predictor" element={<PredictorPage />} />
               <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/marketplace" element={<MarketplacePage />} />
               <Route path="/settings" element={<SettingsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>

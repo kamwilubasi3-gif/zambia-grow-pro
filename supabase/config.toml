@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.crop-scanner]
 verify_jwt = false
+
+[functions.market-finder]
+verify_jwt = false

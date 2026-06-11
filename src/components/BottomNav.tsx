@@ -1,12 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Home, ScanLine, Brain, Bell, Settings } from "lucide-react";
+import { Home, ScanLine, Brain, Store, Settings } from "lucide-react";
 import { useAppState } from "@/context/AppContext";
 
 const navItems = [
   { path: "/scanner", icon: ScanLine, label: "Scanner" },
   { path: "/predictor", icon: Brain, label: "Predictor" },
   { path: "/", icon: Home, label: "Home", isCenter: true },
-  { path: "/notifications", icon: Bell, label: "Alerts" },
+  { path: "/marketplace", icon: Store, label: "Market" },
   { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
