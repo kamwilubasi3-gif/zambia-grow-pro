@@ -4,10 +4,11 @@ import { ZAMBIA_CROPS } from "@/data/zambia";
 
 const ALL_CROPS = Array.from(new Set(Object.values(ZAMBIA_CROPS).flat())).sort();
 import { supabase } from "@/integrations/supabase/client";
-import { Store, Phone, Mail, Globe, MapPin, TrendingUp, Loader2, Sparkles, RefreshCw } from "lucide-react";
+import { Store, Phone, Mail, Globe, MapPin, TrendingUp, Loader2, Sparkles, RefreshCw, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import ContactBuyerDialog from "@/components/ContactBuyerDialog";
 
 interface Buyer {
   name: string;
@@ -49,6 +50,7 @@ const MarketplacePage = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<MarketData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [contactBuyer, setContactBuyer] = useState<Buyer | null>(null);
 
   const fetchMarket = async () => {
     setLoading(true);
@@ -175,19 +177,12 @@ const MarketplacePage = () => {
                     <MapPin className="w-3 h-3" /> {b.location}
                   </div>
                   <div className="flex flex-wrap gap-2 pt-2 border-t">
-                    {b.phone && b.phone !== "Contact via website" && (
-                      <a href={`tel:${b.phone}`} className="flex items-center gap-1 text-xs text-primary hover:underline">
-                        <Phone className="w-3 h-3" /> {b.phone}
-                      </a>
-                    )}
-                    {b.email && b.email !== "Contact via website" && (
-                      <a href={`mailto:${b.email}`} className="flex items-center gap-1 text-xs text-primary hover:underline">
-                        <Mail className="w-3 h-3" /> {b.email}
-                      </a>
-                    )}
+                    <Button size="sm" onClick={() => setContactBuyer(b)} className="flex-1">
+                      <MessageSquare className="w-3 h-3" /> Contact Buyer
+                    </Button>
                     {b.website && (
-                      <a href={b.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs text-accent hover:underline">
-                        <Globe className="w-3 h-3" /> Visit Website
+                      <a href={b.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 px-3 py-1.5 text-xs rounded-md border border-input hover:bg-muted">
+                        <Globe className="w-3 h-3" /> Website
                       </a>
                     )}
                   </div>
