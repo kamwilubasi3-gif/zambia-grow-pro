@@ -1,14 +1,16 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Home, ScanLine, Brain, Bell, Settings, Store, Leaf, X } from "lucide-react";
+import { Home, ScanLine, Brain, Bell, Settings, Store, X } from "lucide-react";
 import { useAppState } from "@/context/AppContext";
+import { useLang } from "@/context/LanguageContext";
+import AppLogo from "./AppLogo";
 
 const items = [
-  { path: "/", icon: Home, label: "Home" },
-  { path: "/scanner", icon: ScanLine, label: "Crop Scanner" },
-  { path: "/predictor", icon: Brain, label: "AI Predictor" },
-  { path: "/marketplace", icon: Store, label: "Marketplace" },
-  { path: "/notifications", icon: Bell, label: "Alerts" },
-  { path: "/settings", icon: Settings, label: "Settings" },
+  { path: "/", icon: Home, key: "home" },
+  { path: "/scanner", icon: ScanLine, key: "scanner" },
+  { path: "/predictor", icon: Brain, key: "predictor" },
+  { path: "/marketplace", icon: Store, key: "marketplace" },
+  { path: "/notifications", icon: Bell, key: "alerts" },
+  { path: "/settings", icon: Settings, key: "settings" },
 ];
 
 interface Props {
@@ -19,6 +21,7 @@ interface Props {
 const DesktopSidebar = ({ mobileOpen = false, onClose }: Props) => {
   const { pathname } = useLocation();
   const { notifications } = useAppState();
+  const { t } = useLang();
   const unread = notifications.filter((n) => !n.read).length;
 
   return (
@@ -42,8 +45,10 @@ const DesktopSidebar = ({ mobileOpen = false, onClose }: Props) => {
         `}
       >
         <div className="p-5 flex items-center gap-3 border-b border-sidebar-border">
-          <div className="w-10 h-10 rounded-xl bg-sidebar-primary flex items-center justify-center">
-            <Leaf className="w-5 h-5 text-sidebar-primary-foreground" />
+          <AppLogo size={44} />
+          <div className="flex-1">
+            <h1 className="font-bold text-lg leading-tight">TIME FARMER</h1>
+            <p className="text-xs opacity-70">Zambia AgriTech</p>
           </div>
           <div className="flex-1">
             <h1 className="font-bold text-lg leading-tight">TIME FARMER</h1>
