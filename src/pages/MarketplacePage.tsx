@@ -203,6 +203,14 @@ const MarketplacePage = () => {
           )}
         </>
       )}
+
+      <ContactBuyerDialog
+        open={!!contactBuyer}
+        onClose={() => setContactBuyer(null)}
+        buyer={contactBuyer}
+        crop={crop}
+        quantity={quantity}
+      />
     </div>
   );
 };
