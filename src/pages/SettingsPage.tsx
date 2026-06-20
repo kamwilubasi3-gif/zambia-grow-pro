@@ -1,5 +1,6 @@
 import { useAppState } from "@/context/AppContext";
-import { Settings, Moon, Sun, Camera, MapPin, RotateCcw } from "lucide-react";
+import { useLang, LANGUAGES, LangCode } from "@/context/LanguageContext";
+import { Settings, Moon, Sun, Camera, MapPin, RotateCcw, Languages } from "lucide-react";
 
 const SettingsPage = () => {
   const {
@@ -8,6 +9,7 @@ const SettingsPage = () => {
     locationAllowed, setLocationAllowed,
     location, setLocation, setSelectedCrop,
   } = useAppState();
+  const { lang, setLang } = useLang();
 
   const handleCameraToggle = async () => {
     if (!cameraAllowed) {
@@ -54,6 +56,29 @@ const SettingsPage = () => {
       </div>
 
       <div className="space-y-2">
+        {/* Language */}
+        <div className="glass-card rounded-xl p-4 space-y-3">
+          <div className="flex items-center gap-3">
+            <Languages className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-sm font-medium text-foreground">Language / Lulimi</p>
+              <p className="text-xs text-muted-foreground">Choose your Zambian language</p>
+            </div>
+          </div>
+          <select
+            value={lang}
+            onChange={(e) => setLang(e.target.value as LangCode)}
+            className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+          >
+            {LANGUAGES.map((l) => (
+              <option key={l.code} value={l.code}>{l.native} ({l.name})</option>
+            ))}
+          </select>
+          <p className="text-[10px] text-muted-foreground">
+            Tap the 🎙️ mic button anywhere in the app to speak commands in your language.
+          </p>
+        </div>
+
         {/* Dark Mode */}
         <div className="glass-card rounded-xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
