@@ -2,6 +2,7 @@ import { ReactNode, useState } from "react";
 import { Menu } from "lucide-react";
 import BottomNav from "./BottomNav";
 import DesktopSidebar from "./DesktopSidebar";
+import AppLogo from "./AppLogo";
 
 const AppShell = ({ children }: { children: ReactNode }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -19,6 +20,7 @@ const AppShell = ({ children }: { children: ReactNode }) => {
           >
             <Menu className="w-5 h-5" />
           </button>
+          <AppLogo size={28} className="ml-2" />
           <span className="ml-2 font-semibold">TIME FARMER</span>
         </header>
         <main className="flex-1 pb-20 md:pb-6 overflow-y-auto">{children}</main>
