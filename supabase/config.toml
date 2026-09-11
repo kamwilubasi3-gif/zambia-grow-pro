@@ -14,3 +14,15 @@ verify_jwt = false
 
 [functions.voice-assistant]
 verify_jwt = false
+
+[functions.auth-phone]
+verify_jwt = false
+
+[functions.admin-users]
+verify_jwt = false
+
+[functions.farm-data]
+verify_jwt = false
+
+[functions.translate]
+verify_jwt = false
